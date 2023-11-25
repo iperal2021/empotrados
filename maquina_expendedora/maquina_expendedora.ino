@@ -2,10 +2,11 @@
 #include "TimerOne.h"
 #include <Thread.h>
 #include <ThreadController.h>
+#include <StaticThreadController.h>
 #include <Adafruit_Sensor.h>
 #include <DHT.h>
 #include <DHT_U.h>
-
+#include <avr/wdt.h>
 
 LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 
@@ -22,17 +23,24 @@ int TH = 9;
 long duration;
 int distance;
 
-int X_axix;
-int Y_axix;
+global int X_axix;
+global int Y_axix;
 
-int STATE = 0;
+global int STATE = 0;
 float price_list[5] = {1.00, 1.10, 1.25, 1.50, 2.00};
 String cafe_list[5] = {"CAFE SOLO", "CAFE CORTADO", "CAFE DOBLE", "CAFE PREMIUM", "CHOCOLATE"};
+String admin_list[4] = {"Ver Temperatura", "Ver Distancia Sensor", "Ver Contador", "Modificar Precios"};
 
 int randNumber;
 
 void setup() {
   // put your setup code here, to run once:
+  static unsigned long tiempoInicio = millis();
+  attachInterrupt(digitalPinToInterrupt(BUTTON), admin_menu, RISING);
+
+  wdt_disable();
+  wdt_enable(WDTO_8S);
+
   Serial.begin(9600);
   lcd.begin(16,2);
 
@@ -59,6 +67,148 @@ void cafe_menu() {
   lcd.print(cafe_list[STATE]);
   lcd.setCursor(0,1);
   lcd.print(price_list[STATE]);
+}
+
+void admin_menu() {
+  STATE = 0;
+  while (true)
+  {
+    analogWrite(LED_GREEN, 255);
+    analogWrite(LED_RED, 255);
+    X_axix = analogRead(JS_X);
+    Y_axix = analogRead(JS_Y);
+
+    lcd.clear();
+
+    if(X_axix > 500){
+      STATE +=1;
+      if (STATE == 4){
+        STATE = 0;
+      }
+    }else if (X_axix < 480){
+      STATE -=1;
+      if (STATE == -1){
+        STATE = 3;
+      }
+    }
+
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print(admin_list[STATE]);
+
+    if (digitalRead(JS_DIGITAL) == LOW){
+      switch (STATE) {
+        case 0:
+          show_temperature();
+          break;
+        
+        case 1:
+          distance();
+          break;
+        
+        case 2:
+          timer();
+          break;
+        
+        case 3:
+          prices();
+          break;
+      }
+    }
+    if (Y_axix < 400)
+    {
+      return;
+    }
+  }
+}
+
+void show_temperature(){
+
+}
+
+void distance(){
+
+}
+
+void timer(){
+  while (true)
+  {
+    lcd.clear()
+    unsigned long tiempoTranscurrido = millis() - tiempoInicio;
+    lcd.print(tiempoTranscurrido);
+    if (Y_axix < 400){
+      return;
+    }
+  }
+}
+
+void prices(){
+  STATE = 0
+  lcd.clear();
+  while (true)
+  {
+    if(X_axix > 500)
+    {
+      STATE +=1;
+      if (STATE == 5){
+        STATE = 0;
+      }
+    } else if (X_axix < 480)
+    {
+      STATE -=1;
+      if (STATE == -1)
+      {
+        STATE = 4;
+      }
+    }
+    lcd.print(price_list[STATE]);
+
+    if (digitalRead(JS_DIGITAL) == LOW)
+    {
+      price_change();
+    }
+    if (Y_axix < 400)
+    {
+      return;
+    }
+  }
+}
+
+void price_change()
+{
+  while (true)
+  {
+    lcd.setCursor(0,0);
+    lcd.print("Nuevo Precio:");
+    lcd.setCursor(0,1);
+    lcd.print(price_list[STATE]);
+    if(X_axix > 500)
+    {
+      price_list[STATE] += 0.05;
+    } else if (X_axix < 480)
+    {
+      price_list[STATE] -= 0.05;
+    }
+    if (Y_axix < 400)
+    {
+      return;
+    }
+  }
+  
+}
+
+void serving() {
+  lcd.clear();
+    randNumber = random(4, 8);
+    lcd.print("Sirviendo...");
+    for (int i = 1; i< 255; i++){
+      analogWrite(LED_GREEN, i);
+      delay(randNumber*1000/253);
+    }
+    analogWrite(LED_GREEN, 0);
+    lcd.clear();
+    lcd.print("RETIRE BEBIDA");
+    delay(3000);
 }
 
 void loop() {
@@ -89,17 +239,7 @@ void loop() {
   }
 
   if (digitalRead(JS_DIGITAL) == LOW){
-    lcd.clear();
-    randNumber = random(4, 8);
-    lcd.print("Sirviendo...");
-    for (int i = 1; i< 255; i++){
-      analogWrite(LED_GREEN, i);
-      delay(randNumber*1000/253);
-    }
-    analogWrite(LED_GREEN, 0);
-    lcd.clear();
-    lcd.print("RETIRE BEBIDA");
-    delay(3000);
+    serving();
   }
   cafe_menu();
 
