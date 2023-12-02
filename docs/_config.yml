@@ -1,0 +1,14 @@
+title: Vending Machine
+description: Documentatión and description of a mending machine made with arduino.
+remote_theme: carlosperate/jekyll-theme-rtd
+
+# Theme settings:
+site_author: Iker Peral del Pino
+repo_url: "https://github.com/iperal2021/empotrados"
+edit_on_github: true
+github_docs_folder: true
+logo: 
+sticky_navigation: true
+prev_next_buttons_location: bottom
+search_enabled: true
+hljs_style: github-gist
