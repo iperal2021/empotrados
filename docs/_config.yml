@@ -7,7 +7,7 @@ site_author: Iker Peral del Pino
 repo_url: "https://github.com/iperal2021/empotrados"
 edit_on_github: true
 github_docs_folder: true
-logo: "https://raw.githubusercontent.com/iperal2021/empotrados/main/docs/assets/img/arduino-logo.png
+logo: "https://raw.githubusercontent.com/iperal2021/empotrados/main/docs/assets/img/arduino-logo.png"
 sticky_navigation: true
 prev_next_buttons_location: bottom
 search_enabled: true
