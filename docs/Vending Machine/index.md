@@ -34,8 +34,10 @@ The fritzing program has been used to design the circuit with the components spe
 The actual circuit looks like this:
 
 <center>
-  <img src="assets/img/vending_machine_real.jpg" width="600" height="400">
+  <img src="assets/img/vendingmachine_circuit.jpg" width="600" height="400">
 </center>
+
+> The wires are new and still rigid. I know it looks bad.
 
 Because the breadboard is completely new, contrary to what might be expected, I had difficulty placing some components, the button causing the most problems, wich comes out by itself occasionally, since it does not fit properly in some areas. of the plate.
 
@@ -327,3 +329,11 @@ void price_change() {
 
 ## Execution and Video
 
+In this video you can see the exectuion of the programm since the start of the board. 
+* First I plug the board into the power supply.
+* I show the running of the distance sensor and the waiting screen.
+* The coffee menu is the first shown. It can be seen the coffee list and their prices.
+* Then I show how to get into the admin menu and it's options.
+* Finally I use the reset function. In the video can be seen that the button and it´s interruption (that I use to calculate the time), sometimes have problems due to bounce in the initialization of the interruption itself.
+
+  (video)
