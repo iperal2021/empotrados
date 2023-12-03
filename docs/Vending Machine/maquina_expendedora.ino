@@ -35,7 +35,6 @@ unsigned long buttonPressStartTime = 0;
 unsigned long timeWhenPress = 0;
 unsigned long timePressed = 0;
 volatile bool isPress = false;
-
 // Listas a usar durante el programa
 float price_list[5] = { 1.00, 1.10, 1.25, 1.50, 2.00 };
 String cafe_list[5] = { "CAFE SOLO", "CAFE CORTADO", "CAFE DOBLE", "CAFE PREMIUM", "CHOCOLATE" };
@@ -58,7 +57,6 @@ void cafe_menu() {
   lcd.print(price_list[STATE]);
 }
 
-// Función de lectura del Joystick para moverse por los distintos menús
 void menu_control(int a, int b) {
   X_axix = analogRead(JS_X);
   Y_axix = analogRead(JS_Y);
@@ -81,7 +79,6 @@ void menu_control(int a, int b) {
   }
 }
 
-// Menu admin
 void admin_menu() {
   analogWrite(LED_GREEN, 255);
   analogWrite(LED_RED, 255);
@@ -89,8 +86,7 @@ void admin_menu() {
   lcd.print(admin_list[STATE]);
 }
 
-// Submenus accesibles desde Admin
-void admin_selector() {
+void admin_slector() {
   lcd.clear();
   switch (STATE) {
     case 0:
@@ -104,29 +100,28 @@ void admin_selector() {
   }
 }
 
-// threads de temperatura y humedad
-// que muestran las lecturas del sensor DHT11
-
-// Thread temperatura
+// threads de temperatura y humedad que muestran las lecturas del sensor DHT11
 void temperature_thread() {
   lcd.clear();
   temperature = dht.readTemperature();
   lcd.print("Temperature:");
   lcd.setCursor(0, 1);
   lcd.print(temperature);
+  lcd.setCursor(2, 1);
+  lcd.write(223);
   delay(1500);
 }
 
-// Thread humedad
 void humidity_thread() {
   lcd.clear();
   humidity = dht.readHumidity();
   lcd.print("Humidity:");
   lcd.setCursor(0, 1);
   lcd.print(humidity);
+  lcd.setCursor(2, 1);
+  lcd.print("%");
 }
 
-// Controller de los threads anteriores
 void show_temperature() {
   lcd.clear();
   while (Y_axix > 300) {
@@ -165,7 +160,6 @@ void timer_thread() {
   delay(100);
 }
 
-// Submenu del contador
 void timer() {
   while (Y_axix > 300) {
     Y_axix = analogRead(JS_Y);
@@ -231,16 +225,21 @@ void serving() {
   lcd.clear();
 }
 
-// Callback de la interrupción
 void button_press() {
   Serial.println("FALLLL");
+  Serial.println("isPress IN:");
+  Serial.println(isPress);
   // Guardar el tiempo cuando se presionó el botón
   buttonPressStartTime = millis();
-  //isPress = true;
+  
+  Serial.println("isPress OUT:");
+  Serial.println(isPress);
 }
 
-// Función de reseteo
-void(* resetFunc) (void) = 0;
+void resetFunc(){
+  wdt_enable(WDTO_15MS);
+  while(1){};
+}
 
 void setup() {
   // put your setup code here, to run once:
@@ -283,6 +282,9 @@ void setup() {
   // Iniciamos el sensor de temperatura/humedad
   dht.begin();
 
+  // Declaramos la interrupción
+  attachInterrupt(digitalPinToInterrupt(BUTTON), button_press, RISING);
+
   // Primera parte del código. Solo se ejecuta 1 vez
   lcd.print("Cargando...");
   for (int i = 0; i <3; i++) {
@@ -294,21 +296,21 @@ void setup() {
     delay(500);
   }
   lcd.clear();
-  // Declaramos la interrupción
-  noInterrupts();
-  attachInterrupt(digitalPinToInterrupt(BUTTON), button_press, RISING);
+  
+  isPress = false;
 }
 
 void loop() {
   // Activamos el ultrasonidos para saber cuando hay una persona delante
-  interrupts();
   ultrasonido.run();
   lcd.setCursor(0, 0);
-  lcd.print("Servicio");
+  lcd.print("Esperando");
   admin = false;
+  buttonPressStartTime = 0;
   while (distance < 100) {
 
     ultrasonido.run();
+    // variables para leer el joystick
     
     if (digitalRead(JS_DIGITAL) == LOW) {
       if (admin){
@@ -325,23 +327,37 @@ void loop() {
       menu_control(5, 4);
       cafe_menu();
     }
-
-    if (digitalRead(BUTTON) == LOW) && (isPress == true) {
-      Serial.println("2");
-      Serial.println(admin);
-      isPress = false;
+    
+    if (digitalRead(BUTTON) == LOW && isPress == false) {
+      Serial.println("isPress 2:");
+      Serial.println(isPress);
       timeWhenPress = millis();
+      timePressed = 0;
+      isPress = true;
     }
 
-    timePressed = buttonPressStartTime - timeWhenPress;
-    Serial.println(timePressed);
-    if (timePressed > 5000) && (isPress == false) {
+    if (buttonPressStartTime > timeWhenPress){
+      timePressed = buttonPressStartTime - timeWhenPress;
+    }
+    
+    if (timePressed > 5000 && isPress == true) {
+      Serial.println(timePressed);
+      Serial.println(buttonPressStartTime);
+      Serial.println(timeWhenPress);
       admin = !admin;
       buttonPressStartTime = 0;
       timeWhenPress = 0;
+      timePressed = 0;
+      isPress = false;
       lcd.clear();
-    } else if (timePressed >= 2000 && timePressed <= 3000) {
+    } else if (timePressed >= 1000 && timePressed <= 3000) {
+      Serial.println(timePressed);
+      Serial.println(buttonPressStartTime);
+      Serial.println(timeWhenPress);
+      delay(500);
       resetFunc();
+    } else {
+      buttonPressStartTime = 0;
     }
 
     // Si dejamos de detectar a la persona volvemos al modo de espera
