@@ -80,7 +80,6 @@ void loop() {
   lcd.print("Servicio");
   admin = false;
   while (distance < 100) {
-
     ultrasonido.run();
 [...]
 ```
@@ -89,31 +88,38 @@ The first of all is to activate the thread used to run the ultrasound and thus d
 
 ```c
 if (admin) {
-    menu_control(4, 3);
-    admin_menu();
+  menu_control(4, 3);
+  admin_menu();
 } else {
-    menu_control(5, 4);
-    cafe_menu();
+  menu_control(5, 4);
+  cafe_menu();
 }
 ```
 
 With this *IF* sentence i can select the menu that is shown in the *LCD*, it depends of the admin variable.
 
 ```c
-if (digitalRead(BUTTON) == LOW) && (isPress == true) {
-    isPress = false;
-    timeWhenPress = millis();
+if (digitalRead(BUTTON) == LOW && isPress == false) {
+  timeWhenPress = millis();
+  timePressed = 0;
+  isPress = true;
 }
 
-timePressed = buttonPressStartTime - timeWhenPress;
-Serial.println(timePressed);
-if (timePressed > 5000) && (isPress == false) {
-    admin = !admin;
-    buttonPressStartTime = 0;
-    timeWhenPress = 0;
-    lcd.clear();
-} else if (timePressed >= 2000 && timePressed <= 3000) {
-    resetFunc();
+if (buttonPressStartTime > timeWhenPress){
+    timePressed = buttonPressStartTime - timeWhenPress;
+}
+
+if (timePressed > 5000 && isPress == true) {
+  admin = !admin;
+  buttonPressStartTime = 0;
+  timeWhenPress = 0;
+  timePressed = 0;
+  isPress = false;
+  lcd.clear();
+} else if (timePressed >= 1000 && timePressed <= 3000) {
+  resetFunc();
+} else {
+  buttonPressStartTime = 0;
 }
 ```
 
@@ -220,13 +226,13 @@ void loop() {
     while (distance < 100) {
         [...]
 
-        if (digitalRead(JS_DIGITAL) == LOW) {
-      if (admin){
-        admin_slector();
-      } else {
-        serving();
+      if (digitalRead(JS_DIGITAL) == LOW) {
+        if (admin){
+          admin_slector();
+        } else {
+          serving();
+        }
       }
-    }
 
     [...]
 
@@ -336,4 +342,6 @@ In this video you can see the exectuion of the programm since the start of the b
 * Then I show how to get into the admin menu and it's options.
 * Finally I use the reset function. In the video can be seen that the button and it´s interruption (that I use to calculate the time), sometimes have problems due to bounce in the initialization of the interruption itself.
 
-  (video)
+
+https://github.com/iperal2021/empotrados/assets/113594702/f01508b7-c629-4902-9fbc-0a2e1cde6b20
+
