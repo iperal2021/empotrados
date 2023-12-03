@@ -12,8 +12,9 @@ The points that I am going to address are the following:
 * Code and explanation of the different functions
 * Execution and video.
 
-Here can be seen the practice statement: [***Practica3_MaquinaExpendedora.pdf***](https://)
-## Desing and assembly
+Here can be seen the practice statement: [***Practica3_MaquinaExpendedora.pdf***](https://github.com/iperal2021/empotrados/blob/main/docs/Vending_Machine/Practica3_MaquinaExpendedora.pdf)
+
+## Desing and assembly 🔧
 
 We are asked to incorporate the following components to carry out the practice:
 
@@ -25,7 +26,7 @@ We are asked to incorporate the following components to carry out the practice:
 * Button
 * Basic LED x2
   
-The fritzing program has been used to design the circuit with the components specified above. The result is this scheme:
+The [*fritzing*](https://fritzing.org/) program has been used to design the circuit with the components specified above. The result is this scheme:
 
 <center>
   <img src="assets/img/vending_machine.jpg" width="600" height="400">
@@ -41,7 +42,7 @@ The actual circuit looks like this:
 
 Because the breadboard is completely new, contrary to what might be expected, I had difficulty placing some components, the button causing the most problems, wich comes out by itself occasionally, since it does not fit properly in some areas. of the plate.
 
-## Code
+## Code 💻
 
 Below I am going to explain the most important functions of the code and why I have chosen to perform them in such a way.
 
@@ -77,7 +78,7 @@ void loop() {
   interrupts();
   ultrasonido.run();
   lcd.setCursor(0, 0);
-  lcd.print("Servicio");
+  lcd.print("Esperando");
   admin = false;
   while (distance < 100) {
     ultrasonido.run();
@@ -96,7 +97,7 @@ if (admin) {
 }
 ```
 
-With this *IF* sentence i can select the menu that is shown in the *LCD*, it depends of the admin variable.
+With this *IF* sentence I can select the menu that is shown in the *LCD*, it depends of the admin variable.
 
 ```c
 if (digitalRead(BUTTON) == LOW && isPress == false) {
@@ -242,9 +243,9 @@ void loop() {
 
 ### 5. Threads
 
-I used a total of four threads, two of them using the thread controller. The threads that I decide to use ar to take the lectures from the ultrasound, the dht sensor and to take the time whe the program was initialized.
+I used a total of four **threads**, two of them using the thread controller. The threads that I decide to use ar to take the lectures from the ultrasound, the dht sensor and to take the time whe the program was initialized.
 
-The tempearature and humidity thread has the exact code except for what is shown on the LCD. With the show_temperature() function I run the thread controller.
+The tempearature and humidity thread has the exact code except for what is shown on the LCD. With the *show_temperature()* function I run the thread controller.
 
 ```c
 void temperature_thread() {
@@ -333,7 +334,7 @@ void price_change() {
 }
 ```
 
-## Execution and Video
+## Execution and Video 📹
 
 In this video you can see the exectuion of the programm since the start of the board. 
 * First I plug the board into the power supply.
@@ -342,6 +343,4 @@ In this video you can see the exectuion of the programm since the start of the b
 * Then I show how to get into the admin menu and it's options.
 * Finally I use the reset function. In the video can be seen that the button and it´s interruption (that I use to calculate the time), sometimes have problems due to bounce in the initialization of the interruption itself.
 
-
 https://github.com/iperal2021/empotrados/assets/113594702/f01508b7-c629-4902-9fbc-0a2e1cde6b20
-
