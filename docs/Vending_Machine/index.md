@@ -344,3 +344,5 @@ In this video you can see the exectuion of the programm since the start of the b
 * Finally I use the reset function. In the video can be seen that the button and it´s interruption (that I use to calculate the time), sometimes have problems due to bounce in the initialization of the interruption itself.
 
 https://github.com/iperal2021/empotrados/assets/113594702/f01508b7-c629-4902-9fbc-0a2e1cde6b20
+
+> Click [**HERE**](https://github.com/iperal2021/empotrados/assets/113594702/f01508b7-c629-4902-9fbc-0a2e1cde6b20) if the video don't show off.
