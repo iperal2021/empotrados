@@ -97,7 +97,7 @@ if (admin) {
 }
 ```
 
-With this *IF* sentence I can select the menu that is shown in the *LCD*, it depends of the admin variable.
+With this *IF* sentence I can select the menu that is shown in the *LCD*, it depends of the admin variable. Previously I used the interruption callback to call the *admin()*, but to avoid recursion I decided to change it to that other form, using only a variable to switch between menus.
 
 ```c
 if (digitalRead(BUTTON) == LOW && isPress == false) {
